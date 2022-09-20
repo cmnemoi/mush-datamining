@@ -35,9 +35,64 @@ def find_all_actions_by_name(logs: pd.DataFrame, action_name: str) -> pd.DataFra
     """
     return logs[logs["Action"] == action_name]
 
-def get_player_logs() -> pd.DataFrame:
+def get_ship_logs(logs: pd.DataFrame, id_ship: int) -> pd.DataFrame:
     """
-    Function to get all the player logs in a DataFrame
+    Function to get all the logs of a given ship
+
+    Parameters :
+    ------------
+    id_ship : int
+        Id of the ship to get the logs from
+    """
+    return logs[logs["Ship"] == id_ship]
+
+def get_character_logs(logs: pd.DataFrame, character: str) -> pd.DataFrame:
+    """
+    Function to get all the logs of a given character
+
+    Parameters :
+    ------------
+    character : str
+        Character name to get the logs from
+    """
+    return logs[logs["Character"] == character]
+
+def get_cycle_of_day_logs(logs: pd.DataFrame, cycle: float) -> pd.DataFrame:
+    """
+    Function to get all the logs of a given cycle of day
+
+    Parameters :
+    ------------
+    cycle : float
+        Cycle number (X.Y) to get the logs from
+    """
+    return logs[logs["Day.Cycle"] == cycle]
+
+def get_logs_before_cycle_of_day(logs: pd.DataFrame, cycle: float) -> pd.DataFrame:
+    """
+    Function to get all the logs before a given cycle of day
+
+    Parameters :
+    ------------
+    cycle : float
+        Cycle number (X.Y) to get the logs before
+    """
+    return logs[logs["Day.Cycle"] <= cycle]
+
+def get_logs_after_cycle_of_day(logs: pd.DataFrame, cycle: float) -> pd.DataFrame:
+    """
+    Function to get all the logs after a given cycle of day
+
+    Parameters :
+    ------------
+    cycle : float
+        Cycle number (X.Y) to get the logs after
+    """
+    return logs[logs["Day.Cycle"] >= cycle]
+
+def load_player_logs() -> pd.DataFrame:
+    """
+    Function to load all the player logs in a DataFrame from CSV or ZIP
 
     Returns :
     ---------
