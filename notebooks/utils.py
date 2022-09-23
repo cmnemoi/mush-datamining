@@ -3,11 +3,11 @@ import shutil
 
 import pandas as pd
 
-def find_action_name_by_log_content(logs: pd.DataFrame, content: str, n: int = 100000) -> str:
+def find_event_name_by_log_content(logs: pd.DataFrame, content: str, n: int = 100000) -> str:
     """
-    Function to find the name of an action given a sub string contained in its log (must be unique)
+    Function to find the name of an event given a sub string contained in its log (must be unique)
      
-    For example `find_action_name_by_log_content("crochet du droit")` returns "FIST_WOUNDED"
+    For example `find_event_name_by_log_content("crochet du droit")` returns "FIST_WOUNDED"
 
     Parameters :
     ------------
@@ -16,24 +16,24 @@ def find_action_name_by_log_content(logs: pd.DataFrame, content: str, n: int = 1
     n : int
         Number of logs to search in the dataset
     """
-    action_name_found = False
+    event_name_found = False
     
-    while not action_name_found:
+    while not event_name_found:
         sample = logs.sample(n)
         for i in sample.index.to_list():
             if content in sample.loc[i, "Log"]:
-                return sample.loc[i, "Action"]
+                return sample.loc[i, "Event"]
 
-def find_all_actions_by_name(logs: pd.DataFrame, action_name: str) -> pd.DataFrame:
+def find_all_events_by_name(logs: pd.DataFrame, event_name: str) -> pd.DataFrame:
     """
-    Function to find all the logs of a given action name
+    Function to find all the logs of a given event name
 
     Parameters :
     ------------
-    action_name : str
-        Name of the action to find
+    event_name : str
+        Name of the event to find
     """
-    return logs[logs["Action"] == action_name]
+    return logs[logs["Event"] == event_name]
 
 def get_ship_logs(logs: pd.DataFrame, id_ship: int) -> pd.DataFrame:
     """
@@ -102,4 +102,4 @@ def load_player_logs() -> pd.DataFrame:
     if not os.path.exists("../data/player_logs.csv"):
         shutil.unpack_archive("../data/player_logs.zip", "../data/")
 
-    return pd.read_csv("../data/player_logs.csv", sep=";")
+    return pd.read_csv("../data/player_logs.csv")
