@@ -21,7 +21,7 @@ And you're done!
 ## Repo Architecture
 
 ```
-|-- data/ --> FDS logs in ZIP format
+|-- data/ --> FDS logs in ZIP and CSV format + data from Twinpedia surveys
 |-- notebooks/ --> thematic data analysis notebooks 
 |-- scripts/  --> scripts to preprocess raw data
 ```

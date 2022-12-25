@@ -7,3 +7,6 @@ __pycache__/
 # IPython
 profile_default/
 ipython_config.py
+
+# logs folder
+logs_Mush2/
