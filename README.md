@@ -6,7 +6,7 @@ It contains example notebooks to make you started.
 ## Getting started
 You need **Python 3.10+** and **[Git LFS](https://git-lfs.github.com/)** to use the notebooks of this repository.
 
-- Activate git lfs : `git lfs install`
+- Activate git lfs and pull data : `git lfs install; git lfs pull`
 - Clone the project : `git clone git@gitlab.com:eternaltwin/mush/fds-logs-analysis.git; cd fds-logs-analysis`
 - Create a virtual environnement with your preferred solution and install the packages from `requirements.txt`.
     - If you use Miniconda/Anaconda : 
