@@ -9,14 +9,9 @@ from optimize import get_empirical_avg_metal_plates_per_day, simulate_avg_metal_
 
 @st.cache_data()
 def load_logs():
-    logs = load_player_logs().dropna()
+    logs = load_player_logs(from_sqlite_db=True).dropna()
     logs.Day = logs.Day.astype(int)
     return logs
-
-@st.cache_data()
-def generate_data(cycles):
-    result = {}
-    return null
 
 st.title("Experimentation avec la formule des incidents de Mush")
 

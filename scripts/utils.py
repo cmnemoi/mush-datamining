@@ -93,17 +93,13 @@ def get_logs_after_cycle_of_day(logs: pd.DataFrame, cycle: float) -> pd.DataFram
 
 def load_player_logs(from_sqlite_db: bool = False) -> pd.DataFrame:
     """
-    Function to load all the player logs in a DataFrame from CSV, ZIP or SQlite3 DB
+    Function to load all the player logs in a DataFrame from CSV, ZIP or sqlite database
 
     Returns :
     ---------
     logs : pd.DataFrame
         Dataframe containing all the player logs
     """
-    if from_sqlite_db:
-        connection = sqlite3.connect("../data/mush.db")
-        return pd.read_sql_query("SELECT * FROM player_logs", connection)
-    
     if not os.path.exists("../data/player_logs.csv"):
         shutil.unpack_archive("../data/player_logs.zip", "../data/")
 
