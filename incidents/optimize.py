@@ -16,20 +16,8 @@ def count_nb_metal_plate_per_day_for_daedalus(daedalus: Daedalus) -> dict:
     return nb_metal_plates_per_day
 
 @cache_data()
-def get_empirical_avg_metal_plates_per_day(logs: pd.DataFrame, max_day: int = 16) -> np.ndarray:
-    logs["metal_plate"] = logs["Event"].apply(lambda x: 1 if x == "EV_ACCIDENT" else 0)
-    avg_metal_plates_per_day = pd.DataFrame()
-    for day in range(1, max_day + 1):
-        day_incidents = logs[logs['Day'] == day].groupby("Ship").sum()["metal_plate"]
-        n = len(day_incidents)
-        avg_metal_plates_per_day = pd.concat([avg_metal_plates_per_day, pd.DataFrame({
-            "Day": [day],
-            "mean_metal_plates": [day_incidents.mean()],
-            "CI (95%)": [day_incidents.std() / np.sqrt(n) * 1.96]
-        })])
-
-    avg_metal_plates_per_day = avg_metal_plates_per_day.reset_index(drop=True)
-    return avg_metal_plates_per_day["mean_metal_plates"].to_numpy()
+def get_empirical_avg_metal_plates_per_day(max_day: int = 16) -> np.ndarray:
+    return load_empricial_avg_metal_plates_per_day()[:max_day]
 
 def get_estimated_avg_metal_plates_per_day(max_day: int = 81) -> float:
     """See notebooks/incidents.ipynb for more details"""

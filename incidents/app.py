@@ -4,25 +4,14 @@ from plotly import express as px
 import numpy as np
 import streamlit as st
 
-from utils import load_player_logs
+from data import load_empricial_avg_metal_plates_per_day
 from optimize import (
-    get_empirical_avg_metal_plates_per_day, 
+    get_empirical_avg_metal_plates_per_day,
     get_estimated_avg_metal_plates_per_day,
     simulate_avg_metal_plates_per_day_given_parameters
 )
 
-@st.cache_data()
-def load_logs():
-    if st.secrets["env"] == "dev":
-        logs = load_player_logs().dropna()
-    else:
-        logs = load_player_logs(from_bucket=True).dropna()
-    logs.Day = logs.Day.astype(int)
-    return logs
-
 st.title("Experimentation avec la formule des incidents de Mush")
-
-logs = load_logs()
 
 nbHeroesAlive = st.slider("Nombre de héros en vie", 1, 16, value=16)
 dailyAPconsumption = st.slider("Consommation de PA journalière", 0, 600, 176)
@@ -40,7 +29,7 @@ overloadFactor = dailyAPconsumption / threshold if dailyAPconsumption > threshol
 
 incidentsPoints = (cycles_elapsed * overloadFactor * c1 + c2).astype(int)
 
-empirical_data = get_empirical_avg_metal_plates_per_day(logs, max_day=max_day)
+empirical_data = get_empirical_avg_metal_plates_per_day(max_day=max_day)
 estimated_data = get_estimated_avg_metal_plates_per_day(max_day=max_day)
 simulated_data = simulate_avg_metal_plates_per_day_given_parameters(
     c1, 
