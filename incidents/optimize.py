@@ -1,12 +1,12 @@
-from streamlit import cache_data
+from streamlit import cache_data, secrets
 from tqdm import tqdm
 
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
 
+from data import load_empricial_avg_metal_plates_per_day
 from Daedalus import Daedalus
-from utils import load_player_logs
 
 def count_nb_metal_plate_per_day_for_daedalus(daedalus: Daedalus) -> dict:
     nb_metal_plates_per_day = {day: 0 for day in [day.split(".")[0] for day in daedalus.incidentsHistory.keys()]}
@@ -27,9 +27,9 @@ def get_estimated_avg_metal_plates_per_day(max_day: int = 81) -> float:
 def simulate_avg_metal_plates_per_day_given_parameters(
         c1: float, 
         c2: float,
-        nb_heroes_alive: int,
-        daily_ap_consumption: int,
-        nb_days: int = 16, 
+        nb_heroes_alive: int = 11.57,
+        daily_ap_consumption: int = 128.1956,
+        nb_days: int = 81, 
         nb_daedaluses: int = 1000
     ) -> np.ndarray:
     daedaluses = [Daedalus(c1, c2, nb_heroes_alive, daily_ap_consumption) for _ in range(nb_daedaluses)]
@@ -42,23 +42,15 @@ def simulate_avg_metal_plates_per_day_given_parameters(
     return pd.DataFrame(nb_metal_plates_per_day).mean()
     
 def objective_function(x: np.ndarray, empirical_data) -> float:
-    simulated_avg_metal_plates_per_day = simulate_avg_metal_plates_per_day_given_parameters(x[0], x[1])
+    simulated_avg_metal_plates_per_day = simulate_avg_metal_plates_per_day_given_parameters(x[0], x[1], nb_daedaluses=100)
     mse = np.sum((empirical_data - simulated_avg_metal_plates_per_day) ** 2)
     print(f'MSE: {mse}')
     return mse
 
 def optimize_parameters(empirical_data: np.ndarray) -> np.ndarray:
-    return opt.direct(objective_function, bounds=[(0, 1), (0, 1)], args=(empirical_data,), maxiter=100)
+    return opt.direct(objective_function, bounds=[(0., 1), (0., 1)], args=(empirical_data,), maxiter=100)
 
 if __name__ == "__main__":
-    print('Loading logs...')
-    logs = load_player_logs().dropna()
-    logs.Day = logs.Day.astype(int)
-    print('Done.')
-    print('Computing empirical average metal plates per day...')
-    empirical_avg_metal_plates_per_day = get_empirical_avg_metal_plates_per_day(logs)
-    print('Done.')
-    print('Finding parameters matching empirical average metal plates per day...')
-    print(optimize_parameters(empirical_avg_metal_plates_per_day))
+    pass
     
         
