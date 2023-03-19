@@ -52,9 +52,9 @@ simulated_data = simulate_avg_metal_plates_per_day_given_parameters(
 )
 
 fig = go.Figure()
-fig.add_trace(go.Scatter(x=days_elapsed, y=empirical_data, name="Observé", mode="markers"))
-fig.add_trace(go.Scatter(x=days_elapsed, y=estimated_data, name="Estimé", mode="markers"))
-fig.add_trace(go.Scatter(x=days_elapsed, y=simulated_data, name="Simulé", mode="markers"))
+fig.add_trace(go.Scatter(x=days_elapsed, y=empirical_data, name="Observé"))
+fig.add_trace(go.Scatter(x=days_elapsed, y=estimated_data, name="Estimé"))
+fig.add_trace(go.Scatter(x=days_elapsed, y=simulated_data, name="Simulé"))
 fig.update_layout(
     title="Nombre de plaques métalliques moyen en fonction du jour",
     xaxis_title="Jour",
