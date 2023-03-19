@@ -31,6 +31,10 @@ def get_empirical_avg_metal_plates_per_day(logs: pd.DataFrame, max_day: int = 16
     avg_metal_plates_per_day = avg_metal_plates_per_day.reset_index(drop=True)
     return avg_metal_plates_per_day["mean_metal_plates"].to_numpy()
 
+def get_estimated_avg_metal_plates_per_day(max_day: int = 81) -> float:
+    """See notebooks/incidents.ipynb for more details"""
+    return 8 * 0.00333438 * np.arange(1, max_day + 1, 1) ** 1.65620137
+
 @cache_data()
 def simulate_avg_metal_plates_per_day_given_parameters(
         c1: float, 
