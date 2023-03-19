@@ -5,11 +5,18 @@ import numpy as np
 import streamlit as st
 
 from utils import load_player_logs
-from optimize import get_empirical_avg_metal_plates_per_day, simulate_avg_metal_plates_per_day_given_parameters
+from optimize import (
+    get_empirical_avg_metal_plates_per_day, 
+    get_estimated_avg_metal_plates_per_day,
+    simulate_avg_metal_plates_per_day_given_parameters
+)
 
 @st.cache_data()
 def load_logs():
-    logs = load_player_logs().dropna()
+    if st.secrets["env"] == "dev":
+        logs = load_player_logs().dropna()
+    else:
+        logs = load_player_logs(from_bucket=True).dropna()
     logs.Day = logs.Day.astype(int)
     return logs
 
@@ -19,9 +26,10 @@ logs = load_logs()
 
 nbHeroesAlive = st.slider("Nombre de héros en vie", 1, 16, value=16)
 dailyAPconsumption = st.slider("Consommation de PA journalière", 0, 600, 176)
-c1 = st.slider("Constante 1", 0.010, 1., step=0.001, value=0.09)
-c2 = st.slider("Constante 2", 0.010, 1., step=0.001, value=0.03)
+c1 = st.slider("Constante 1", 0., 1., step=0.001, value=0.09)
+c2 = st.slider("Constante 2", -5., 1., step=0.001, value = 0.03)
 max_day = st.slider("Simuler jusqu'au jour", 1, 81, 16)
+nb_daedaluses = st.slider("Nombre de vaisseaux à simuler (+ de vaisseaux = meilleure simulation mais chargement plus long)", 100, 1000, 100, step=100)
 st.warning("Attention : les données observées au delà du jour 16 sont très imprécises et doivent être considérées avec prudence.")
 
 days_elapsed = np.arange(0, max_day)
@@ -33,17 +41,20 @@ overloadFactor = dailyAPconsumption / threshold if dailyAPconsumption > threshol
 incidentsPoints = (cycles_elapsed * overloadFactor * c1 + c2).astype(int)
 
 empirical_data = get_empirical_avg_metal_plates_per_day(logs, max_day=max_day)
+estimated_data = get_estimated_avg_metal_plates_per_day(max_day=max_day)
 simulated_data = simulate_avg_metal_plates_per_day_given_parameters(
     c1, 
     c2, 
     nb_heroes_alive=nbHeroesAlive, 
     daily_ap_consumption=dailyAPconsumption,
     nb_days=max_day,
+    nb_daedaluses=nb_daedaluses
 )
 
 fig = go.Figure()
-fig.add_trace(go.Scatter(x=days_elapsed, y=empirical_data, name="Observé"))
-fig.add_trace(go.Scatter(x=days_elapsed, y=simulated_data, name="Simulé"))
+fig.add_trace(go.Scatter(x=days_elapsed, y=empirical_data, name="Observé", mode="markers"))
+fig.add_trace(go.Scatter(x=days_elapsed, y=estimated_data, name="Estimé", mode="markers"))
+fig.add_trace(go.Scatter(x=days_elapsed, y=simulated_data, name="Simulé", mode="markers"))
 fig.update_layout(
     title="Nombre de plaques métalliques moyen en fonction du jour",
     xaxis_title="Jour",
