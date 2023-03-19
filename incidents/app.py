@@ -1,3 +1,5 @@
+import os
+
 from plotly import graph_objects as go
 from plotly import express as px
 
@@ -13,7 +15,7 @@ from optimize import (
 
 @st.cache_data()
 def load_logs():
-    if st.secrets["env"] == "dev":
+    if os.environ["env"] == "dev":
         logs = load_player_logs().dropna()
     else:
         logs = load_player_logs(from_bucket=True).dropna()
