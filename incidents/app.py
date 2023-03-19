@@ -13,19 +13,14 @@ def load_logs():
     logs.Day = logs.Day.astype(int)
     return logs
 
-@st.cache_data()
-def generate_data(cycles):
-    result = {}
-    return null
-
 st.title("Experimentation avec la formule des incidents de Mush")
 
 logs = load_logs()
 
 nbHeroesAlive = st.slider("Nombre de héros en vie", 1, 16, value=16)
-dailyAPconsumption = st.slider("Consommation de PA journalière", 0, 600, 1)
-c1 = st.slider("Constante 1", 0.010, 1., step=0.001, value=0.500)
-c2 = st.slider("Constante 2", 0.010, 1., step=0.001, value=0.500)
+dailyAPconsumption = st.slider("Consommation de PA journalière", 0, 600, 176)
+c1 = st.slider("Constante 1", 0.010, 1., step=0.001, value=0.09)
+c2 = st.slider("Constante 2", 0.010, 1., step=0.001, value=0.03)
 max_day = st.slider("Simuler jusqu'au jour", 1, 81, 16)
 st.warning("Attention : les données observées au delà du jour 16 sont très imprécises et doivent être considérées avec prudence.")
 
