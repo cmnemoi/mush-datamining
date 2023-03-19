@@ -1,3 +1,4 @@
+from streamlit import cache_data
 from tqdm import tqdm
 
 import numpy as np
@@ -14,23 +15,33 @@ def count_nb_metal_plate_per_day_for_daedalus(daedalus: Daedalus) -> dict:
         nb_metal_plates_per_day[day] += incidents.count("Metal plate")
     return nb_metal_plates_per_day
 
-def get_empirical_avg_metal_plates_per_day(logs: pd.DataFrame) -> np.ndarray:
+@cache_data()
+def get_empirical_avg_metal_plates_per_day(logs: pd.DataFrame, max_day: int = 16) -> np.ndarray:
     logs["metal_plate"] = logs["Event"].apply(lambda x: 1 if x == "EV_ACCIDENT" else 0)
     avg_metal_plates_per_day = pd.DataFrame()
-    for day in range(1, 16 + 1):
+    for day in range(1, max_day + 1):
         day_incidents = logs[logs['Day'] == day].groupby("Ship").sum()["metal_plate"]
-        
+        n = len(day_incidents)
         avg_metal_plates_per_day = pd.concat([avg_metal_plates_per_day, pd.DataFrame({
             "Day": [day],
-            "mean_metal_plates": [day_incidents.mean()]
+            "mean_metal_plates": [day_incidents.mean()],
+            "CI (95%)": [day_incidents.std() / np.sqrt(n) * 1.96]
         })])
 
     avg_metal_plates_per_day = avg_metal_plates_per_day.reset_index(drop=True)
     return avg_metal_plates_per_day["mean_metal_plates"].to_numpy()
 
-def simulate_avg_metal_plates_per_day_given_parameters(x: float, y: float, nb_days: int = 16, nb_daedaluses: int = 1000) -> np.ndarray:
-    daedaluses = [Daedalus(x, y) for _ in range(nb_daedaluses)]
-    print(f"Simulating {nb_daedaluses} daedaluses with parameters ({x}, {y}) for {nb_days} days...")
+@cache_data()
+def simulate_avg_metal_plates_per_day_given_parameters(
+        c1: float, 
+        c2: float,
+        nb_heroes_alive: int,
+        daily_ap_consumption: int,
+        nb_days: int = 16, 
+        nb_daedaluses: int = 1000
+    ) -> np.ndarray:
+    daedaluses = [Daedalus(c1, c2, nb_heroes_alive, daily_ap_consumption) for _ in range(nb_daedaluses)]
+    print(f"Simulating {nb_daedaluses} daedaluses with parameters ({c1}, {c2}) for {nb_days} days...")
     for daedalus in tqdm(daedaluses):
         for _ in range(nb_days * 8):
             daedalus.change_cycle(print_incidents=False)
@@ -45,7 +56,7 @@ def objective_function(x: np.ndarray, empirical_data) -> float:
     return mse
 
 def optimize_parameters(empirical_data: np.ndarray) -> np.ndarray:
-    return opt.direct(objective_function, bounds=[(0.10, 0.2), (0.15, 0.25)], args=(empirical_data,))
+    return opt.direct(objective_function, bounds=[(0, 1), (0, 1)], args=(empirical_data,), maxiter=100)
 
 if __name__ == "__main__":
     print('Loading logs...')
