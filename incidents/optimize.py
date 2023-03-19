@@ -60,7 +60,7 @@ def optimize_parameters(empirical_data: np.ndarray) -> np.ndarray:
 
 if __name__ == "__main__":
     print('Loading logs...')
-    logs = load_player_logs(from_sqlite_db=True).dropna()
+    logs = load_player_logs().dropna()
     logs.Day = logs.Day.astype(int)
     print('Done.')
     print('Computing empirical average metal plates per day...')

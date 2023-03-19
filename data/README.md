@@ -19,7 +19,6 @@
 - NERON_annoucements.csv : NERON announcements extracted from the `raw_logs.zip` 1710 Mush ships and merged in a single CSV file
 - blaster_twinpedia.csv : Answers from a Twinpedia survey about blaster damage
 - couteau_twinpedia.csv : Answers from a Twinpedia survey about knife damage
-- mush.db : A SQLite database containing the `player_logs` table for online usage
 
 
 
