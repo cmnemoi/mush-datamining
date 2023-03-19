@@ -99,7 +99,7 @@ def load_player_logs() -> pd.DataFrame:
     logs : pd.DataFrame
         Dataframe containing all the player logs
     """
-    if not os.path.exists("../data/player_logs.csv"):
-        shutil.unpack_archive("../data/player_logs.zip", "../data/")
+    if not os.path.exists("data/player_logs.csv"):
+        shutil.unpack_archive("data/player_logs.zip", "/data/")
 
-    return pd.read_csv("../data/player_logs.csv")
+    return pd.read_csv("data/player_logs.csv")
