@@ -1,7 +1,6 @@
 import os
 import shutil
 
-from streamlit import secrets
 import pandas as pd
 
 def find_event_name_by_log_content(logs: pd.DataFrame, content: str, n: int = 100000) -> str:
@@ -101,7 +100,7 @@ def load_player_logs(from_bucket: bool = False) -> pd.DataFrame:
         Dataframe containing all the player logs
     """
     if from_bucket:
-        return pd.read_csv(secrets["player_logs_path"])
+        return pd.read_csv(os.environ["player_logs_path"])
     if not os.path.exists("data/player_logs.csv"):
         shutil.unpack_archive("data/player_logs.zip", "/data/")
 
