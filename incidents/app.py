@@ -11,21 +11,21 @@ from optimize import (
 )
 
 st.title("Experimentation avec la formule des incidents de Mush")
+st.warning("Attention : les données observées au delà du jour 16 sont très imprécises et doivent être considérées avec prudence.")
 
 columns = st.columns(3)
 
 with columns[0]:
+    c1 = st.slider("Constante 1", 0., 1., step=0.001, value=0.21)
+    c2 = st.slider("Constante 2", -5., 1., step=0.001, value = 0.03)
+with columns[1]:
     nbHeroesAlive = st.slider("Nombre de héros en vie", 1., 16., value=11.57)
     dailyAPconsumption = st.slider("Consommation de PA journalière", 0., 600., 128.1956)
-with columns[1]:
-    c1 = st.slider("Constante 1", 0., 1., step=0.001, value=0.09)
-    c2 = st.slider("Constante 2", -5., 1., step=0.001, value = 0.03)
 with columns[2]:
     incidentPointsRatio = st.slider("Pourentage de points d'incidents à dépenser à chaque cycle", 0, 100, step=1, value=50) / 100
     nb_daedaluses = st.slider("Nombre de vaisseaux à simuler (+ de vaisseaux = meilleure simulation mais chargement plus long)", 100, 1000, 100, step=100)
     
 max_day = st.slider("Simuler jusqu'au jour", 1, 81, 81)
-st.warning("Attention : les données observées au delà du jour 16 sont très imprécises et doivent être considérées avec prudence.")
 
 days_elapsed = np.arange(0, max_day)
 cycles_elapsed = days_elapsed * 8
