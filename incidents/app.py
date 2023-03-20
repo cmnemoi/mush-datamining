@@ -16,7 +16,7 @@ st.warning("Attention : les données observées au delà du jour 16 sont très i
 columns = st.columns(3)
 
 with columns[0]:
-    c1 = st.slider("Constante 1", 0., 1., step=0.001, value=0.21)
+    c1 = st.slider("Constante 1", 0., 1., step=0.001, value=0.09)
     c2 = st.slider("Constante 2", -5., 1., step=0.001, value = 0.03)
 with columns[1]:
     nbHeroesAlive = st.slider("Nombre de héros en vie", 1., 16., value=11.57)
