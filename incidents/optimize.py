@@ -1,4 +1,4 @@
-from streamlit import cache_data, secrets
+from streamlit import cache_data
 from tqdm import tqdm
 
 import numpy as np
@@ -27,12 +27,13 @@ def get_estimated_avg_metal_plates_per_day(max_day: int = 81) -> float:
 def simulate_avg_metal_plates_per_day_given_parameters(
         c1: float, 
         c2: float,
+        incidentsPointsRatio: float = 0.5,
         nb_heroes_alive: int = 11.57,
         daily_ap_consumption: int = 128.1956,
         nb_days: int = 81, 
         nb_daedaluses: int = 1000
     ) -> np.ndarray:
-    daedaluses = [Daedalus(c1, c2, nb_heroes_alive, daily_ap_consumption) for _ in range(nb_daedaluses)]
+    daedaluses = [Daedalus(c1, c2, nb_heroes_alive, daily_ap_consumption, incidentPointsRatioToSpend=incidentsPointsRatio) for _ in range(nb_daedaluses)]
     print(f"Simulating {nb_daedaluses} daedaluses with parameters ({c1}, {c2}) for {nb_days} days...")
     for daedalus in tqdm(daedaluses):
         for _ in range(nb_days * 8):
