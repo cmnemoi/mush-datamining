@@ -41,7 +41,7 @@ overloadFactor = dailyAPconsumption / threshold if dailyAPconsumption > threshol
 incidentsPoints = (cycles_elapsed * overloadFactor * c1 + c2).astype(int)
 
 empirical_data = get_empirical_avg_metal_plates_per_day(max_day=max_day, add_survie_ships=add_survie_ships)
-estimated_data = get_estimated_avg_metal_plates_per_day(max_day=max_day)
+estimated_data = get_estimated_avg_metal_plates_per_day(max_day=max_day, add_survie_ships=add_survie_ships)
 simulated_data = simulate_avg_metal_plates_per_day_given_parameters(
     c1, 
     c2,
