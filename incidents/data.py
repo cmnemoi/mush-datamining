@@ -1,15 +1,17 @@
 from google.oauth2.service_account import Credentials
 from streamlit import cache_data, secrets
 
+import numpy as np
 import pandas as pd
 
 @cache_data()
-def load_empricial_avg_metal_plates_per_day():
+def load_empricial_avg_metal_plates_per_day(add_survie_ships: bool) -> np.ndarray:
     gcp_service_account = secrets.gcp_service_account
     avg_metal_plates_per_day = pd.read_gbq(
         query=f"""
         WITH t AS (
             SELECT Ship, Day, SUM(metal_plate_event) AS metal_plates FROM `avian-sunlight-350718.mush.player_logs`
+            WHERE is_survie_ship = {str(add_survie_ships)}
             GROUP BY Ship, Day
         )
         SELECT Day, AVG(t.metal_plates) AS mean_metal_plates 

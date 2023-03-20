@@ -24,8 +24,13 @@ with columns[1]:
 with columns[2]:
     incidentPointsRatio = st.slider("Pourentage de points d'incidents à dépenser à chaque cycle", 0, 100, step=1, value=50) / 100
     nb_daedaluses = st.slider("Nombre de vaisseaux à simuler (+ de vaisseaux = meilleure simulation mais chargement plus long)", 100, 1000, 100, step=100)
+
+add_survie_ships = st.checkbox('Prendre en compte les vaisseaux "survie"', value=False)
+if add_survie_ships:
+    max_day = st.slider("Simuler jusqu'au jour", 1, 81, 81)
+else:
+    max_day = st.slider("Simuler jusqu'au jour", 1, 27, 16)
     
-max_day = st.slider("Simuler jusqu'au jour", 1, 81, 81)
 
 days_elapsed = np.arange(0, max_day)
 cycles_elapsed = days_elapsed * 8
@@ -35,7 +40,7 @@ overloadFactor = dailyAPconsumption / threshold if dailyAPconsumption > threshol
 
 incidentsPoints = (cycles_elapsed * overloadFactor * c1 + c2).astype(int)
 
-empirical_data = get_empirical_avg_metal_plates_per_day(max_day=max_day)
+empirical_data = get_empirical_avg_metal_plates_per_day(max_day=max_day, add_survie_ships=add_survie_ships)
 estimated_data = get_estimated_avg_metal_plates_per_day(max_day=max_day)
 simulated_data = simulate_avg_metal_plates_per_day_given_parameters(
     c1, 

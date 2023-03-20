@@ -16,12 +16,12 @@ def count_nb_metal_plate_per_day_for_daedalus(daedalus: Daedalus) -> dict:
     return nb_metal_plates_per_day
 
 @cache_data()
-def get_empirical_avg_metal_plates_per_day(max_day: int = 16) -> np.ndarray:
-    return load_empricial_avg_metal_plates_per_day()[:max_day]
+def get_empirical_avg_metal_plates_per_day(max_day: int, add_survie_ships: bool) -> np.ndarray:
+    return load_empricial_avg_metal_plates_per_day(add_survie_ships)[:max_day]
 
-def get_estimated_avg_metal_plates_per_day(max_day: int = 81) -> float:
-    """See notebooks/incidents.ipynb for more details"""
-    return 8 * 0.00333438 * np.arange(1, max_day + 1, 1) ** 1.65620137
+def get_estimated_avg_metal_plates_per_day(max_day: int) -> float:
+    result = opt.curve_fit(lambda x, a, b, c: a * np.power(x, b) + c, np.arange(1, max_day + 1), get_empirical_avg_metal_plates_per_day(max_day, add_survie_ships=False))
+    return result[0][0] * np.arange(1, max_day + 1, 1) ** result[0][1] + result[0][2]
 
 @cache_data()
 def simulate_avg_metal_plates_per_day_given_parameters(
