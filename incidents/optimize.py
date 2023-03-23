@@ -25,16 +25,13 @@ def get_estimated_avg_metal_plates_per_day(max_day: int, add_survie_ships: bool)
 
 @cache_data()
 def simulate_avg_metal_plates_per_day_given_parameters(
-        c1: float, 
-        c2: float,
-        incidentsPointsRatio: float = 0.5,
         nb_heroes_alive: int = 11.57,
         daily_ap_consumption: int = 128.1956,
         nb_days: int = 81, 
         nb_daedaluses: int = 1000
     ) -> np.ndarray:
-    daedaluses = [Daedalus(c1, c2, nb_heroes_alive, daily_ap_consumption, incidentPointsRatioToSpend=incidentsPointsRatio) for _ in range(nb_daedaluses)]
-    print(f"Simulating {nb_daedaluses} daedaluses with parameters ({c1}, {c2}) for {nb_days} days...")
+    daedaluses = [Daedalus(nb_heroes_alive, daily_ap_consumption) for _ in range(nb_daedaluses)]
+    print(f"Simulating {nb_daedaluses} daedaluses for {nb_days} days...")
     for daedalus in tqdm(daedaluses):
         for _ in range(nb_days * 8):
             daedalus.change_cycle(print_incidents=False)
