@@ -4,16 +4,11 @@ from plotly import express as px
 import numpy as np
 import streamlit as st
 
-from optimize import (
-    get_empirical_metal_plates_indicators_per_day,
-    simulate_avg_metal_plates_per_day_given_parameters
-)
+from SimulationService import SimulationService
 
 st.title("Experimentation avec la formule des incidents de Mush")
 st.warning("Attention : les données observées au delà du jour 16 sont très imprécises et doivent être considérées avec prudence.")
 
-nbHeroesAlive = st.slider("Nombre de héros en vie", 1., 16., value=13.30)
-dailyAPconsumption = st.slider("Consommation de PA journalière", 0., 600., 161.83)
 nb_daedaluses = st.slider("Nombre de vaisseaux à simuler (+ de vaisseaux = meilleure simulation mais chargement plus long)", 100, 1000, 100, step=100)
 
 add_survie_ships = st.checkbox('Prendre en compte les vaisseaux "survie"', value=False)
@@ -21,23 +16,21 @@ if add_survie_ships:
     max_day = st.slider("Simuler jusqu'au jour", 1, 81, 81)
 else:
     max_day = st.slider("Simuler jusqu'au jour", 1, 27, 16)
-    
 
-days_elapsed = np.arange(0, max_day)
+days_elapsed = np.arange(1, max_day+1)
 cycles_elapsed = days_elapsed * 8
 
-threshold = 7 * nbHeroesAlive
-overloadFactor = dailyAPconsumption / threshold if dailyAPconsumption > threshold else 1
+simulation_service = SimulationService()
 
-empirical_data = get_empirical_metal_plates_indicators_per_day(max_day, add_survie_ships)
+empirical_data = simulation_service.get_empirical_metal_plates_indicators_per_day(max_day, add_survie_ships)
 empirical_data["lower_bound"] = empirical_data["mean_metal_plates"] - 2.32 * empirical_data["std_metal_plates"] / np.sqrt(empirical_data["n"])
 empirical_data["upper_bound"] = empirical_data["mean_metal_plates"] + 2.32 * empirical_data["std_metal_plates"] / np.sqrt(empirical_data["n"])
 empirical_avg_metal_plates = empirical_data["mean_metal_plates"].to_numpy()
-simulated_data = simulate_avg_metal_plates_per_day_given_parameters(
-    nb_heroes_alive=nbHeroesAlive, 
-    daily_ap_consumption=dailyAPconsumption,
-    nb_days=max_day,
-    nb_daedaluses=nb_daedaluses
+simulated_data = simulation_service.simulate_avg_metal_plates_per_day_given_parameters(
+    simulation_service.get_empirical_nb_heroes_alive_per_day(max_day, add_survie_ships),
+    simulation_service.get_empirical_ap_spent_per_day(max_day, add_survie_ships),
+    _nb_days=max_day,
+    _nb_daedaluses=nb_daedaluses
 )
 
 fig = go.Figure()
@@ -91,18 +84,3 @@ fig.add_annotation(
     showarrow=False
 )
 st.plotly_chart(fig)
-
-st.write("Formule des points d'incidents:")
-st.markdown(
-    """
-    ```
-    Si consommation de PA journalière < 7 * nombre de héros en vie alors
-        multiplicateur = 1
-    Sinon
-        multiplicateur = consommation de PA journalière / (7 * nombre de héros en vie) 
-
-    Points d'incidents = Nombre de cycles écoulés x multiplicateur x Constante_1 
-    + Constante_2
-    ```
-    """
-)

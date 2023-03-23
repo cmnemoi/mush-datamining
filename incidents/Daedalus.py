@@ -3,7 +3,7 @@ import random
 from DaedalusIncident import DaedalusIncident
 
 class Daedalus():
-    def __init__(self, nb_heroes_alive = 0, daily_ap_consumption = 0):
+    def __init__(self, nb_heroes_alive, daily_AP_consumption):
         self.day = 1
         self.cycle = 0
         self.incidents_points = 0
@@ -21,8 +21,8 @@ class Daedalus():
         ]
         self.incidentsHistory = {}
         self.C2 = 0.5
-        self.nb_heroes_alive = nb_heroes_alive
-        self.daily_AP_consumption = daily_ap_consumption
+        self.nb_heroes_alive = nb_heroes_alive["mean_nb_heroes_alive"]
+        self.daily_AP_consumption = daily_AP_consumption["mean_ap_spent"]
         self.HARD_MODE_START_DAY = 4
         self.VERY_HARD_MODE_START_DAY = 9
         self.BASE_INCIDENT_POINTS_THRESHOLD = 18        
@@ -80,8 +80,8 @@ class Daedalus():
         return cycle_incidents
     
     def __get_overload_factor__(self) -> float:
-        threshold = 7 * self.nb_heroes_alive
-        return self.daily_AP_consumption / threshold if self.daily_AP_consumption > threshold else 1
+        threshold = 7 * self.nb_heroes_alive[self.day - 1]
+        return self.daily_AP_consumption[self.day - 1] / threshold if self.daily_AP_consumption[self.day - 1] > threshold else 1
 
     def __str__(self) -> str:
         return f"Day {self.day} Cycle {self.cycle}"
