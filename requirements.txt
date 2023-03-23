@@ -8,3 +8,4 @@ protobuf>=3.12,<4
 google-cloud-bigquery==3.7.0
 pandas-gbq==0.19.1
 streamlit==1.20.0
+optuna==3.1.0
