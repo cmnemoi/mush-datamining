@@ -30,7 +30,6 @@ class Daedalus():
     def change_cycle(self, print_incidents=True):
         self.__update_daedalus_stats__()
         self.__update_incident_points__(self.__compute_incidents_points_to_add__())
-        print(f'{self} incidents points: {self.incidents_points}')
         cycle_incidents = self.__draw_cycle_incidents__()
         if print_incidents:
             print(f'{self} incidents:')
