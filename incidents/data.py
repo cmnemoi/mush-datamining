@@ -5,16 +5,16 @@ import numpy as np
 import pandas as pd
 
 @cache_data()
-def load_empricial_avg_metal_plates_per_day(add_survie_ships: bool) -> np.ndarray:
+def load_empricial_metal_plates_indicators_per_day(add_survie_ships: bool) -> np.ndarray:
     gcp_service_account = secrets.gcp_service_account
-    avg_metal_plates_per_day = pd.read_gbq(
+    metal_plates_indicators = pd.read_gbq(
         query=f"""
         WITH t AS (
             SELECT Ship, Day, SUM(metal_plate_event) AS metal_plates FROM `avian-sunlight-350718.mush.player_logs`
             WHERE is_survie_ship = {str(add_survie_ships)}
             GROUP BY Ship, Day
         )
-        SELECT Day, AVG(t.metal_plates) AS mean_metal_plates 
+        SELECT Day, AVG(t.metal_plates) AS mean_metal_plates, STDDEV(t.metal_plates) AS std_metal_plates, COUNT(*) AS n
         FROM t
         WHERE Day IS NOT NULL
         GROUP by Day
@@ -23,8 +23,8 @@ def load_empricial_avg_metal_plates_per_day(add_survie_ships: bool) -> np.ndarra
         credentials=Credentials.from_service_account_info(gcp_service_account),
     )
 
-    avg_metal_plates_per_day = avg_metal_plates_per_day.reset_index(drop=True)
-    return avg_metal_plates_per_day["mean_metal_plates"].to_numpy()
+    metal_plates_indicators = metal_plates_indicators.reset_index(drop=True)
+    return metal_plates_indicators
 
 if __name__ == "__main__":
     pass

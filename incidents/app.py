@@ -5,16 +5,15 @@ import numpy as np
 import streamlit as st
 
 from optimize import (
-    get_empirical_avg_metal_plates_per_day,
-    get_estimated_avg_metal_plates_per_day,
+    get_empirical_metal_plates_indicators_per_day,
     simulate_avg_metal_plates_per_day_given_parameters
 )
 
 st.title("Experimentation avec la formule des incidents de Mush")
 st.warning("Attention : les données observées au delà du jour 16 sont très imprécises et doivent être considérées avec prudence.")
 
-nbHeroesAlive = st.slider("Nombre de héros en vie", 1., 16., value=11.57)
-dailyAPconsumption = st.slider("Consommation de PA journalière", 0., 600., 128.1956)
+nbHeroesAlive = st.slider("Nombre de héros en vie", 1., 16., value=13.30)
+dailyAPconsumption = st.slider("Consommation de PA journalière", 0., 600., 161.83)
 nb_daedaluses = st.slider("Nombre de vaisseaux à simuler (+ de vaisseaux = meilleure simulation mais chargement plus long)", 100, 1000, 100, step=100)
 
 add_survie_ships = st.checkbox('Prendre en compte les vaisseaux "survie"', value=False)
@@ -30,8 +29,10 @@ cycles_elapsed = days_elapsed * 8
 threshold = 7 * nbHeroesAlive
 overloadFactor = dailyAPconsumption / threshold if dailyAPconsumption > threshold else 1
 
-empirical_data = get_empirical_avg_metal_plates_per_day(max_day=max_day, add_survie_ships=add_survie_ships)
-estimated_data = get_estimated_avg_metal_plates_per_day(max_day=max_day, add_survie_ships=add_survie_ships)
+empirical_data = get_empirical_metal_plates_indicators_per_day(max_day, add_survie_ships)
+empirical_data["lower_bound"] = empirical_data["mean_metal_plates"] - 2.32 * empirical_data["std_metal_plates"] / np.sqrt(empirical_data["n"])
+empirical_data["upper_bound"] = empirical_data["mean_metal_plates"] + 2.32 * empirical_data["std_metal_plates"] / np.sqrt(empirical_data["n"])
+empirical_avg_metal_plates = empirical_data["mean_metal_plates"].to_numpy()
 simulated_data = simulate_avg_metal_plates_per_day_given_parameters(
     nb_heroes_alive=nbHeroesAlive, 
     daily_ap_consumption=dailyAPconsumption,
@@ -40,8 +41,36 @@ simulated_data = simulate_avg_metal_plates_per_day_given_parameters(
 )
 
 fig = go.Figure()
-fig.add_trace(go.Scatter(x=days_elapsed, y=empirical_data, name="Observé"))
-fig.add_trace(go.Scatter(x=days_elapsed, y=estimated_data, name="Estimé"))
+fig.add_trace(go.Scatter(
+    x=days_elapsed, 
+    y=empirical_avg_metal_plates, 
+    name="Observé",
+))
+fig.add_trace(go.Scatter(
+    name="Intervalle de confiance (99%)",
+    x=days_elapsed,
+    y=empirical_data["upper_bound"],
+    marker=dict(color="#444"),
+    line=dict(width=0),
+    mode='lines',
+    fillcolor='rgba(68, 68, 68, 0.3)',
+    fill='tonexty',
+    hoverinfo="skip",
+    showlegend=True
+))
+fig.add_trace(go.Scatter(
+        name="Lower Bound",
+        x=days_elapsed,
+        y=empirical_data["lower_bound"],
+        marker=dict(color="#444"),
+        line=dict(width=0),
+        mode='lines',
+        fillcolor='rgba(68, 68, 68, 0.3)',
+        fill='tonexty',
+        hoverinfo="skip",
+        showlegend=False
+    )
+)
 fig.add_trace(go.Scatter(x=days_elapsed, y=simulated_data, name="Simulé"))
 fig.update_layout(
     title="Nombre de plaques métalliques moyen en fonction du jour",
@@ -51,14 +80,14 @@ fig.update_layout(
 # add MAE and RMSE on the graph
 fig.add_annotation(
     x=max_day / 2,
-    y=empirical_data.max(),
-    text=f"RMSE: {np.sqrt(np.sum((empirical_data - simulated_data) ** 2)):.2f}",
+    y=empirical_avg_metal_plates.max(),
+    text=f"RMSE: {np.sqrt(np.mean((empirical_avg_metal_plates - simulated_data) ** 2)):.2f}",
     showarrow=False
 )
 fig.add_annotation(
     x=max_day / 2,
-    y=empirical_data.max() - empirical_data.std() / 4,
-    text=f"MAE: {np.sum(np.abs(empirical_data - simulated_data)):.2f}",
+    y=empirical_avg_metal_plates.max() - empirical_avg_metal_plates.std() / 4,
+    text=f"MAE: {np.mean(np.abs(empirical_avg_metal_plates - simulated_data)):.2f}",
     showarrow=False
 )
 st.plotly_chart(fig)
