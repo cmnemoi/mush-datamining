@@ -14,22 +14,27 @@ def count_nb_metal_plate_per_day_for_daedalus(daedalus: Daedalus) -> dict:
         nb_metal_plates_per_day[day] += incidents.count("Metal plate")
     return nb_metal_plates_per_day
 
+@cache_data()
 def get_empirical_avg_metal_plates_per_day(max_day: int, add_survie_ships: bool) -> np.ndarray:
     empirical_metal_plates_indicators = Repository.load_empricial_metal_plates_indicators_per_day(add_survie_ships)
     return empirical_metal_plates_indicators["mean_metal_plates"].values[:max_day]
 
+@cache_data()
 def get_empirical_metal_plates_indicators_per_day(max_day: int, add_survie_ships: bool) -> pd.DataFrame:
     empirical_metal_plates_indicators = Repository.load_empricial_metal_plates_indicators_per_day(add_survie_ships)
     return empirical_metal_plates_indicators.loc[:max_day - 1]
 
+@cache_data()
 def get_empirical_ap_spent_per_day(max_day: int, add_survie_ships: bool) -> pd.DataFrame:
     ap_spent_per_day = Repository.load_ap_spent_per_day(add_survie_ships)
     return ap_spent_per_day.loc[:max_day - 1]
 
+@cache_data()
 def get_empirical_nb_heroes_alive_per_day(max_day: int, add_survie_ships: bool) -> pd.DataFrame:
     nb_heroes_alive_per_day = Repository.load_nb_heroes_alive_per_day(add_survie_ships)
     return nb_heroes_alive_per_day.loc[:max_day - 1]
 
+@cache_data()
 def simulate_avg_metal_plates_per_day_given_parameters(
         nb_heroes_alive: int,
         daily_ap_consumption: float,
