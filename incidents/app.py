@@ -4,7 +4,8 @@ from plotly import express as px
 import numpy as np
 import streamlit as st
 
-import SimulationService 
+import SimulationService
+import StatsService
 
 st.title("Experimentation avec la formule des incidents de Mush")
 st.warning("Attention : les données observées au delà du jour 16 sont très imprécises et doivent être considérées avec prudence.")
@@ -21,8 +22,7 @@ days_elapsed = np.arange(1, max_day+1)
 cycles_elapsed = days_elapsed * 8
 
 empirical_data = SimulationService.get_empirical_metal_plates_indicators_per_day(max_day, add_survie_ships)
-empirical_data["lower_bound"] = empirical_data["mean_metal_plates"] - 2.32 * empirical_data["std_metal_plates"] / np.sqrt(empirical_data["n"])
-empirical_data["upper_bound"] = empirical_data["mean_metal_plates"] + 2.32 * empirical_data["std_metal_plates"] / np.sqrt(empirical_data["n"])
+empirical_data["lower_bound"], empirical_data["upper_bound"] = StatsService.compute_confidence_interval(empirical_data["mean_metal_plates"], empirical_data["std_metal_plates"], empirical_data["n"], 0.99)
 empirical_avg_metal_plates = empirical_data["mean_metal_plates"].to_numpy()
 simulated_data = SimulationService.simulate_avg_metal_plates_per_day_given_parameters(
     nb_heroes_alive=SimulationService.get_empirical_nb_heroes_alive_per_day(max_day, add_survie_ships),
@@ -82,3 +82,4 @@ fig.add_annotation(
     showarrow=False
 )
 st.plotly_chart(fig)
+st.dataframe(empirical_data)
