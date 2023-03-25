@@ -7,11 +7,12 @@ GCP_SERVICE_ACCOUNT = secrets.gcp_service_account
 
 @cache_data()
 def load_empricial_metal_plates_indicators_per_day(add_survie_ships: bool) -> pd.DataFrame:
+    survie_ship_condition = "WHERE is_survie_ship = False" if not add_survie_ships else ""
     metal_plates_indicators = pd.read_gbq(
         query=f"""
         WITH t AS (
             SELECT Ship, Day, SUM(metal_plate_event) AS metal_plates FROM `{GCP_SERVICE_ACCOUNT.project_id}.mush.player_logs`
-            WHERE is_survie_ship = {str(add_survie_ships)}
+            {survie_ship_condition}
             GROUP BY Ship, Day
         )
         SELECT Day, AVG(t.metal_plates) AS mean_metal_plates, STDDEV(t.metal_plates) AS std_metal_plates, COUNT(*) AS n
@@ -27,11 +28,12 @@ def load_empricial_metal_plates_indicators_per_day(add_survie_ships: bool) -> pd
 
 @cache_data()
 def load_ap_spent_per_day(add_survie_ships: bool) -> pd.DataFrame:
+    survie_ship_condition = "WHERE is_survie_ship = False" if not add_survie_ships else ""
     ap_spent_per_day = pd.read_gbq(
         query=f"""
         WITH t AS (
             SELECT Ship, Day, SUM(event_ap_cost) AS event_ap_cost FROM `{GCP_SERVICE_ACCOUNT.project_id}.mush.player_logs`
-            WHERE is_survie_ship = {str(add_survie_ships)} AND event_ap_cost IS NOT NULL
+            {survie_ship_condition}
             GROUP BY Ship, Day
         )
         SELECT Day, AVG(t.event_ap_cost) AS mean_ap_spent, STDDEV(t.event_ap_cost) AS std_ap_spent, COUNT(*) AS n
@@ -47,11 +49,12 @@ def load_ap_spent_per_day(add_survie_ships: bool) -> pd.DataFrame:
 
 @cache_data()
 def load_nb_heroes_alive_per_day(add_survie_ships: bool) -> pd.DataFrame:
+    survie_ship_condition = "WHERE is_survie_ship = False" if not add_survie_ships else ""
     nb_heroes_alive_per_day = pd.read_gbq(
         query=f"""
         WITH t AS (
             SELECT Ship, Day, COUNT(DISTINCT Character) AS nb_heroes_alive FROM `{GCP_SERVICE_ACCOUNT.project_id}.mush.player_logs`
-            WHERE is_survie_ship = {str(add_survie_ships)}
+            {survie_ship_condition}
             GROUP BY Ship, Day
         )
         SELECT Day, AVG(t.nb_heroes_alive) AS mean_nb_heroes_alive, STDDEV(t.nb_heroes_alive) AS std_nb_heroes_alive, COUNT(*) AS n
