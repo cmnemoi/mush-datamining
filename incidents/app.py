@@ -82,4 +82,3 @@ fig.add_annotation(
     showarrow=False
 )
 st.plotly_chart(fig)
-st.dataframe(empirical_data)
